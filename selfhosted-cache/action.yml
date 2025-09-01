@@ -1,0 +1,15 @@
+name: "Simple self-hosted cache"
+description: "Jobs running on main will persist given path as cache, and jobs running on other branches will restore from that cache if it exists."
+author: "mo@avianlabs.net"
+
+inputs:
+  cache-scope-ref:
+    description: Cache is updated after a successful build on this ref.
+    default: main
+  path:
+    description: The path to cache (relative to working-directory)
+
+runs:
+  using: "node20"
+  main: "dist/main.js"
+  post: "dist/post.js"
