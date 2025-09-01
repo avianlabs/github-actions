@@ -6,8 +6,8 @@ inputs:
   cache-scope-ref:
     description: Cache is updated after a successful build on this ref.
     default: main
-  home-directory:
-    description: The home directory for self-hosted runners.
+  cache-dir:
+    description: The cache directory for self-hosted runners.
   path:
     description: The path(s) to cache (relative to working-directory). Can be a single path or multiple paths separated by newlines.
 
