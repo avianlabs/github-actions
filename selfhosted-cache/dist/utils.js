@@ -1,5 +1,16 @@
 import { execSync } from 'node:child_process';
 import path from 'node:path';
+import { homedir } from 'node:os';
+
+function resolvePath(filePath, cwd) {
+  if (filePath.startsWith('~/')) {
+    return path.join(homedir(), filePath.slice(2));
+  }
+  if (path.isAbsolute(filePath)) {
+    return filePath;
+  }
+  return path.join(cwd, filePath);
+}
 
 export function withDirs(func) {
   const cacheDirBase = readInput('cache-dir').trim();
@@ -27,10 +38,10 @@ export function withDirs(func) {
   
   // Call the function for each path
   for (const pathName of paths) {
-    const cacheDir = path.join(cacheDirBase, repo, pathName);
-    const targetDir = path.join(gw, pathName);
+    const targetDir = resolvePath(pathName, gw);
+    const cacheDir = path.join(cacheDirBase, repo, targetDir);
     
-    func({ cacheDir, targetDir, lockFile, pathName });
+    func({ cacheDir, targetDir, lockFile, pathName: targetDir });
   }
 }
 
