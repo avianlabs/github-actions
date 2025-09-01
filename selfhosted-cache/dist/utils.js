@@ -12,6 +12,7 @@ export function getDirs() {
     throw new Error('Input "path" is required');
   }
   
+  const gw = process.env.GITHUB_WORKSPACE;
   const repo = process.env.GITHUB_REPOSITORY;
   const cacheDir = path.join(homeDir, 'selfhosted-cache', repo, pathToCache);
   const targetDir = path.join(gw, pathToCache);
