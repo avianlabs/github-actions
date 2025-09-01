@@ -2,15 +2,21 @@ import { execSync } from 'node:child_process';
 import path from 'node:path';
 
 export function getDirs() {
-    const repo = process.env.GITHUB_REPOSITORY;         // owner/repo
-    const gw = process.env.GITHUB_WORKSPACE;            // e.g. /home/runner/_work/repo/repo
-    const repoRoot = path.dirname(gw);                  // e.g. /home/runner/_work/repo
-    let pathToCache = readInput('path').trim();
+  const homeDir = readInput('home-directory').trim();
+  if (!homeDir) {
+    throw new Error('Input "home-directory" is required');
+  }
 
-    const cacheDir = path.join(repoRoot, '_caches', repo, pathToCache);
-    const targetDir = path.join(gw, pathToCache);
+  const pathToCache = readInput('path').trim();
+  if (!pathToCache) {
+    throw new Error('Input "path" is required');
+  }
+  
+  const repo = process.env.GITHUB_REPOSITORY;
+  const cacheDir = path.join(homeDir, 'selfhosted-cache', repo, pathToCache);
+  const targetDir = path.join(gw, pathToCache);
 
-    return { cacheDir, targetDir };
+  return { cacheDir, targetDir };
 }
 
 export function readInput(name) {
