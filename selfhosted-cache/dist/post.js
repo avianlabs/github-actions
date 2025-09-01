@@ -1,4 +1,4 @@
-import { getDirs, runBash, readInput } from './utils.js';
+import { withDirs, runBash, readInput } from './utils.js';
 
 (function run() {
   try {
@@ -12,22 +12,24 @@ import { getDirs, runBash, readInput } from './utils.js';
       return;
     }
 
-    const { cacheDir, targetDir, lockFile } = getDirs();
-
-    runBash(`mkdir -p "${cacheDir}"`);
-    runBash(`
-      (
-        flock -w 30 9 || { echo "Could not acquire cache lock"; exit 1; }
-        if [ -d "${targetDir}" ]; then
-          rsync -a --delete "${targetDir}/" "${cacheDir}/"
-          echo "Updated cache"
-          echo "Cache dir: ${cacheDir}"
-          echo "Target dir: ${targetDir}"
-        else
-          echo "Nothing to cache at: ${targetDir}"
-        fi
-      ) 9>"${lockFile}"
-    `);
+    withDirs(({ cacheDir, targetDir, lockFile, pathName }) => {
+      console.log(`Processing path: ${pathName}`);
+      
+      runBash(`mkdir -p "${cacheDir}"`);
+      runBash(`
+        (
+          flock -w 30 9 || { echo "Could not acquire cache lock"; exit 1; }
+          if [ -d "${targetDir}" ]; then
+            rsync -a --delete "${targetDir}/" "${cacheDir}/"
+            echo "Updated cache for ${pathName}"
+            echo "Cache dir: ${cacheDir}"
+            echo "Target dir: ${targetDir}"
+          else
+            echo "Nothing to cache at: ${targetDir} for ${pathName}"
+          fi
+        ) 9>"${lockFile}"
+      `);
+    });
   } catch (err) {
     console.warn(`failed updating cache: ${err.message || err}`);
   }

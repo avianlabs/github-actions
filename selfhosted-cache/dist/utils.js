@@ -1,7 +1,7 @@
 import { execSync } from 'node:child_process';
 import path from 'node:path';
 
-export function getDirs() {
+export function withDirs(func) {
   const homeDir = readInput('home-directory').trim();
   if (!homeDir) {
     throw new Error('Input "home-directory" is required');
@@ -12,12 +12,26 @@ export function getDirs() {
     throw new Error('Input "path" is required');
   }
   
+  // Split paths by newlines and filter out empty lines
+  const paths = pathToCache.split('\n')
+    .map(p => p.trim())
+    .filter(p => p.length > 0);
+  
+  if (paths.length === 0) {
+    throw new Error('At least one path must be provided');
+  }
+  
   const gw = process.env.GITHUB_WORKSPACE;
   const repo = process.env.GITHUB_REPOSITORY;
-  const cacheDir = path.join(homeDir, 'selfhosted-cache', repo, pathToCache);
-  const targetDir = path.join(gw, pathToCache);
-
-  return { cacheDir, targetDir };
+  const lockFile = path.join(homeDir, 'selfhosted-cache', repo, '.lock');
+  
+  // Call the function for each path
+  for (const pathName of paths) {
+    const cacheDir = path.join(homeDir, 'selfhosted-cache', repo, pathName);
+    const targetDir = path.join(gw, pathName);
+    
+    func({ cacheDir, targetDir, lockFile, pathName });
+  }
 }
 
 export function readInput(name) {
