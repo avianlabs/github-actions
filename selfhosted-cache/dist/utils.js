@@ -7,7 +7,7 @@ export function getDirs() {
     const repoRoot = path.dirname(gw);                  // e.g. /home/runner/_work/repo
     let pathToCache = readInput('path').trim();
 
-    const cacheDir = path.join(repoRoot, '_caches', repo, 'next-cache');
+    const cacheDir = path.join(repoRoot, '_caches', repo, pathToCache);
     const targetDir = path.join(gw, pathToCache);
 
     return { cacheDir, targetDir };
