@@ -9,7 +9,7 @@ inputs:
   home-directory:
     description: The home directory for self-hosted runners.
   path:
-    description: The path to cache (relative to working-directory)
+    description: The path(s) to cache (relative to working-directory). Can be a single path or multiple paths separated by newlines.
 
 runs:
   using: "node20"
